@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import disample.ChangePasswordService;
 import disample.MemberDao;
 import disample.MemberRegisterService;
+import spring.MemberInfoPrinter;
 
 @Configuration
 public class AppCtx {
@@ -30,5 +31,18 @@ public ChangePasswordService changePwdSvc() {
 	ChangePasswordService pwdSvc = new ChangePasswordService();
 			pwdSvc.setMemberDao(memberDao());
 	return pwdSvc;
+}
+
+@Bean
+public MemberPrinter memberPrinter() {
+	return new MemberPrinter();
+}
+
+@Bean
+public MemberInfoPrinter infoPrinter() {
+	MemberInfoPrinter infoPrinter = new MemberInfoPrinter();
+	infoPrinter.setMemberDao(memberDao());
+	infoPrinter.setMemberPrinter(memberPrinter());
+	return infoPrinter;
 }
 }

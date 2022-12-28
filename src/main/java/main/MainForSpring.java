@@ -6,12 +6,14 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import config.AppCtx;
-import disample.ChangePasswordService;
-import disample.DuplicateMemberException;
-import disample.MemberNotFoundException;
-import disample.MemberRegisterService;
-import disample.RegisterRequest;
-import disample.WrongIdPasswordException;
+import spring.ChangePasswordService;
+import spring.DuplicateMemberException;
+import spring.MemberInfoPrinter;
+import spring.MemberListPrinter;
+import spring.MemberNotFoundException;
+import spring.MemberRegisterService;
+import spring.RegisterRequest;
+import spring.WrongIdPasswordException;
 
 public class MainForSpring {
 
@@ -39,12 +41,32 @@ public class MainForSpring {
 				processChangeCommand(command.split(" "));
 				continue;
 			}
+			else if (command.startsWith("list")) {
+				processListCommand();
+				continue;
+			}
+			else if (command.startsWith("info")) {
+				processInfoCommand(command.split(" "));
+				continue;
+			}
 			printHelp();
 		}
 	}
 	
-	// Assembler 객체를 생성하면 필요한 모든 객체가 생성되고 설정됨
-	// private static Assembler assembler = new Assembler();
+	private static void processInfoCommand(String[] args) {
+		if (args.length != 2) {
+			printHelp();
+			return;
+		}
+		
+		MemberInfoPrinter infoPrinter = ctx.getBean("infoPrinter", MemberInfoPrinter.class);
+		infoPrinter.printMemberInfo(args[1]);
+	}
+
+	private static void processListCommand() {
+		MemberListPrinter listPrinter = ctx.getBean("listPrinter", MemberListPrinter.class);
+		listPrinter.printAll();
+	}
 
 	// 입력받은 회원정보를 등록하는 메서드
 	private static void processNewCommand(String[] args) {
@@ -54,9 +76,8 @@ public class MainForSpring {
 			return;
 		}
 		
-		
+		// Assembler 클래스에 정의된 getter 메서드를 이용해서 사용할 객체를 구함
 		// MemberRegisterService regSvc = assembler.getMemberRegisterService();
-		// getBean() 메서드를 이용해서 사용할 객체를 구함
 		MemberRegisterService regSvc = ctx.getBean("memberRegSvc", MemberRegisterService.class);
 		RegisterRequest req = new RegisterRequest();
 		req.setEmail(args[1]);
@@ -86,8 +107,8 @@ public class MainForSpring {
 			return;
 		}
 		
+		// Assembler 클래스에 정의된 getter 메서드를 이용해서 사용할 객체를 구함
 		// ChangePasswordService changePwdSvc = assembler.getChangePasswordService();
-		// getBean() 메서드를 이용해서 사용할 객체를 구함
 		ChangePasswordService changePwdSvc = ctx.getBean("changePwdSvc", ChangePasswordService.class);
 		try {		
 			changePwdSvc.changePassword(args[1], args[2], args[3]);
@@ -107,8 +128,11 @@ public class MainForSpring {
 		System.out.println("명령어 사용법");
 		System.out.println("new 이메일 이름 암호 암호확인");
 		System.out.println("change 이메일 현재비번 변경비번");
+		System.out.println("list");
+		System.out.println("info 이메일");
 		System.out.println();
 	}
 }
+
 
 
